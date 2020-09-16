@@ -21,6 +21,7 @@ class ContentRecommender():
             self.similarity_df = pd.DataFrame(self.similarity_measure(X, X),
                  index = titles)
             self.item_names = self.similarity_df.index
+        return self.similarity_df    
 
         
     def get_recommendations(self, item, n=5):
