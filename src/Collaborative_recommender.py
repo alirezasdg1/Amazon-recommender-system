@@ -46,7 +46,7 @@ class CollaborativeRecommender():
         sim_options = {'name': 'cosine', 'user_based': False}
         return self.algo.compute_similarities(sim_options)    
 
-    def predictions(self):
+    def pred(self):
         self.predictions = self.algo.test(self.trainset.build_testset())
         acc = accuracy.rmse(self.predictions)
         
@@ -76,35 +76,22 @@ class CollaborativeRecommender():
         except ValueError:
             return 0
     
-    # def get_top_n(predictions, n=10):
-    # """Return the top-N recommendation for each user from a set of predictions.
+    def get_top_n(predictions, n=10):
+        """Return the top-N recommendation for each user from a set of predictions.
+        """
+        # First map the predictions to each user.
+        top_n = defaultdict(list)
+        for uid, iid, true_r, est, _ in predictions:
+            top_n[uid].append((iid, est))
 
-    # Args:
-    #     predictions(list of Prediction objects): The list of predictions, as
-    #         returned by the test method of an algorithm.
-    #     n(int): The number of recommendation to output for each user. Default
-    #         is 10.
+        # Then sort the predictions for each user and retrieve the k highest ones.
+        for uid, user_ratings in top_n.items():
+            user_ratings.sort(key=lambda x: x[1], reverse=True)
+            top_n[uid] = user_ratings[:n]
 
-    # Returns:
-    # A dict where keys are user (raw) ids and values are lists of tuples:
-    #     [(raw item id, rating estimation), ...] of size n.
-    # """
-
-    # # First map the predictions to each user.
-    # top_n = defaultdict(list)
-    # for uid, iid, true_r, est, _ in predictions:
-    #     top_n[uid].append((iid, est))
-
-    # # Then sort the predictions for each user and retrieve the k highest ones.
-    # for uid, user_ratings in top_n.items():
-    #     user_ratings.sort(key=lambda x: x[1], reverse=True)
-    #     top_n[uid] = user_ratings[:n]
-
-    # return top_n
-
-
+        return top_n
 
 
 if __name__ == "__main__":
-    # spark = SparkSession.builder.getOrCreate()
+    
     pass
