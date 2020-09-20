@@ -29,7 +29,7 @@ class ContentRecommender():
         return self.item_names[self.similarity_df.loc[item].values.argsort()[-(n+1):-1]].values[::-1]
 
 
-    def get_user_profile(self, items):
+    def get_user_preference(self, items):
 
         user_profile = np.zeros(self.item_counts.shape[1])
         for item in items:
