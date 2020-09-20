@@ -9,19 +9,20 @@ class ContentRecommender():
         self.item_names = None
         self.similarity_measure = cosine_similarity
     
-    def fit(self, X, titles=None):
+    def fit(self, X, items=None):
    
         if isinstance(X, pd.DataFrame):
             self.item_counts = X
-            self.item_names = X.index
+            self.item_counts.reindex(items)
+            self.item_names = items
             self.similarity_df = pd.DataFrame(self.similarity_measure(X.values, X.values),
                  index = self.item_names)
         else:
-            self.item_counts = X
+            self.item_counts = pd.DataFrame(X, index = items)
             self.similarity_df = pd.DataFrame(self.similarity_measure(X, X),
-                 index = titles)
+                 index = items)
             self.item_names = self.similarity_df.index
-        return self.similarity_df    
+        return self.similarity_df  
 
         
     def get_recommendations(self, item, n=5):
@@ -41,7 +42,7 @@ class ContentRecommender():
     def get_user_recommendation(self, items, n=5):
 
         num_items = len(items)
-        user_profile = self.get_user_profile(items)
+        user_profile = self.get_user_preference(items)
 
         user_sim =  self.similarity_measure(self.item_counts, user_profile.reshape(1,-1))
 
