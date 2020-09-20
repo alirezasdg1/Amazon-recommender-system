@@ -17,13 +17,13 @@ class CollaborativeRecommender():
     def __init__(self,df,reader,model):
         self.data = surprise.Dataset.load_from_df(df,reader)
         self.trainset = self.data.build_full_trainset()
+        self.model = model
         self.algo = None
         
     
     
     def grid(self,param_grid,cv=3):
 
-        sim_options = {'name': 'pearson_baseline', 'user_based': False}
         raw_ratings = self.data.raw_ratings
         random.shuffle(raw_ratings)
         # A = 90% of the data, B = 10% of the data
@@ -32,7 +32,7 @@ class CollaborativeRecommender():
         B_raw_ratings = raw_ratings[threshold:]
         self.data.raw_ratings = A_raw_ratings  # data is now the set A
 
-        grid_search = GridSearchCV(KNNBaseline(sim_options=sim_options), param_grid, measures=['rmse'], cv=3)
+        grid_search = GridSearchCV(self.model, param_grid, measures=['rmse'], cv=3)
         grid_search.fit(self.data)
         self.algo = grid_search.best_estimator['rmse']
 
