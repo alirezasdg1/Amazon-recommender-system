@@ -44,10 +44,19 @@ class CollaborativeRecommender():
 
     def pred(self):
         self.predictions = self.algo.test(self.trainset.build_testset())
+        self.df_pred = pd.DataFrame.from_dict(self.predictions)
+        self.df_pred['err'] = abs(self.df_pred.est - self.df_pred.r_ui)
         acc = accuracy.rmse(self.predictions)
         
-        return self.predictions, acc
-    
+        return self.df_pred, acc
+
+    def utility_matrix(self):
+        self.um_model = self.df_pred.pivot_table(index='uid',columns='iid', values='est')
+        self.um_err = self.df_pred.pivot_table(index='uid',columns='iid', values='err')
+
+        return self.um_model
+        
+
     def get_Iu(self,uid):
         """ return the number of items rated by given user
         args: 
@@ -71,23 +80,15 @@ class CollaborativeRecommender():
             return len(self.trainset.ir[self.trainset.to_inner_iid(iid)])
         except ValueError:
             return 0
-    
-    def get_top_n(self,n=10):
-        """Return the top-N recommendation for each user from a set of predictions.
-        """
-        # First map the predictions to each user.
-        top_n = defaultdict(list)
-        for uid, iid, true_r, est, _ in self.predictions:
-            top_n[uid].append((iid, est))
 
-        # Then sort the predictions for each user and retrieve the k highest ones.
-        for uid, user_ratings in top_n.items():
-            user_ratings.sort(key=lambda x: x[1], reverse=True)
-            top_n[uid] = user_ratings[:n]
+            
+    
+    def get_top_n(self,UI,n=10):
+        recommended_items = pd.DataFrame(self.um_model.loc[UI])
+        recommended_items.columns = ["predicted_rating"]
+        top_n = recommended_items.sort_values('predicted_rating', ascending=False).head(n)
 
         return top_n
-
-
 
 if __name__ == "__main__":
     
