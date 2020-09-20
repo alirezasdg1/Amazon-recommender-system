@@ -4,10 +4,10 @@ import sys
 from io import StringIO
 import surprise
 from sklearn.model_selection import train_test_split, GridSearchCV
-
+from collections import defaultdict
 import random
 
-from surprise import SVD, NMF
+from surprise import SVD, NMF, KNNBaseline
 from surprise import Dataset
 from surprise import accuracy
 from surprise.model_selection import GridSearchCV
@@ -17,12 +17,13 @@ class CollaborativeRecommender():
     def __init__(self,df,reader,model):
         self.data = surprise.Dataset.load_from_df(df,reader)
         self.trainset = self.data.build_full_trainset()
-        self.model = model
-        self.alog = None
+        self.algo = None
         
     
     
     def grid(self,param_grid,cv=3):
+
+        sim_options = {'name': 'pearson_baseline', 'user_based': False}
         raw_ratings = self.data.raw_ratings
         random.shuffle(raw_ratings)
         # A = 90% of the data, B = 10% of the data
@@ -31,20 +32,15 @@ class CollaborativeRecommender():
         B_raw_ratings = raw_ratings[threshold:]
         self.data.raw_ratings = A_raw_ratings  # data is now the set A
 
-        grid_search = GridSearchCV(NMF, param_grid, measures=['rmse'], cv=3)
+        grid_search = GridSearchCV(KNNBaseline(sim_options=sim_options), param_grid, measures=['rmse'], cv=3)
         grid_search.fit(self.data)
         self.algo = grid_search.best_estimator['rmse']
 
         return self
 
     def fit(self):
-        
         self.algo.fit(self.trainset)
-        return self
-
-    def similarity(self):
-        sim_options = {'name': 'cosine', 'user_based': False}
-        return self.algo.compute_similarities(sim_options)    
+   
 
     def pred(self):
         self.predictions = self.algo.test(self.trainset.build_testset())
@@ -76,12 +72,12 @@ class CollaborativeRecommender():
         except ValueError:
             return 0
     
-    def get_top_n(predictions, n=10):
+    def get_top_n(self,n=10):
         """Return the top-N recommendation for each user from a set of predictions.
         """
         # First map the predictions to each user.
         top_n = defaultdict(list)
-        for uid, iid, true_r, est, _ in predictions:
+        for uid, iid, true_r, est, _ in self.predictions:
             top_n[uid].append((iid, est))
 
         # Then sort the predictions for each user and retrieve the k highest ones.
@@ -90,6 +86,7 @@ class CollaborativeRecommender():
             top_n[uid] = user_ratings[:n]
 
         return top_n
+
 
 
 if __name__ == "__main__":
