@@ -79,17 +79,14 @@ def get_new_data():
 @app.route('/predict-current', methods = ["GET", "POST"])
 def predict2():
 
-    recommended_items = recom_content.get_recommendations(item)
-
     userID = request.form['userID']
-    #recomms = pkl_func2(userID)
-    recomms = pd.DataFrame({"asin":[1, 2, 3, 4, 5],
-                "title":["A", "B", "C", "D", "E"],
-                "links":["https://images-na.ssl-images-amazon.com/images/I/717Y104so7L._SL1500_.jpg",
-                "https://images-na.ssl-images-amazon.com/images/I/510ygOpgnAL._SY550_.jpg",
-                "https://images-na.ssl-images-amazon.com/images/I/31i3sjXGebL._SX425_.jpg",
-                "https://images-na.ssl-images-amazon.com/images/I/51YTdPxBU4L._SY355_.jpg",
-                "https://images-na.ssl-images-amazon.com/images/I/91r7p2GP0UL._AC_SX425_.jpg"]})
+    #get asin for User ID
+    user_preference = recom_colab.get_top_n(userID,n=1)
+    this_asin = user_preference.index[0]
+    item = this_asin
+    #get top 5 recommendations for the asin
+    recommended_items = recom_content.get_recommendations(item)
+    recomms = df_items.loc[recommended_items]
 
     page = f'''
         <form action="/predict-new" method='POST'>
@@ -98,19 +95,17 @@ def predict2():
           <br><br>
           <input type="submit" value="Search">
         </form>
-        <h2>You might also like</h2>
-        <div id="banner" style="overflow: hidden; display: flex; justify-content:space-around;">
-        <p margin-top: 10;>{recomms.loc[0, "title"]}</p>
-        <img id="product_img1" src={recomms.loc[0, "links"]} alt="product 1"  style = "display: inline-block; height:200px;">
-        <p margin-top: 10em;>{recomms.loc[1, "title"]}</p>
-        <img id="product_img2" src={recomms.loc[1, "links"]} alt="product 2" style = "display: inline-block; height:200px;">
-        <p margin-top: 10em;>{recomms.loc[2, "title"]}</p>
-        <img id="product_img3" src={recomms.loc[2, "links"]} alt="product 3" style = "display: inline-block; height:200px;">
-        <p margin-top: 10em;>{recomms.loc[3, "title"]}</p>
-        <img id="product_img4" src={recomms.loc[3, "links"]} alt="product 4" style = "display: inline-block; height:200px;">
-        <p margin-top: 10em;>{recomms.loc[4, "title"]}</p>
-        <img id="product_img5" src={recomms.loc[4, "links"]} alt="product 5" style = "display: inline-block; height:200px;">
-        </div>
+        <h2>Recommended for You</h2>
+        <p margin-top: 10;>{df_items.loc[this_asin]["title"]}</p>
+        <img id="product_img1" src={df_items.loc[this_asin]["links"][-1]} alt="product 1"  style = "display: inline-block; height:100px;">
+        <p margin-top: 10em;>{recomms["title"][0]}</p>
+        <img id="product_img2" src={recomms["links"][0][-1]} alt="product 2" style = "display: inline-block; height:100px;">
+        <p margin-top: 10em;>{recomms["title"][1]}</p>
+        <img id="product_img3" src={recomms["links"][1][-1]} alt="product 3" style = "display: inline-block; height:100px;">
+        <p margin-top: 10em;>{recomms["title"][2]}</p>
+        <img id="product_img4" src={recomms["links"][2][-1]} alt="product 4" style = "display: inline-block; height:100px;">
+        <p margin-top: 10em;>{recomms["title"][3]}</p>
+        <img id="product_img5" src={recomms["links"][3][-1]} alt="product 5" style = "display: inline-block; height:100px;">
     '''
     return page
 
