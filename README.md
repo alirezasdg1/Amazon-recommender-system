@@ -13,7 +13,7 @@ As mentioned above, to develop a recommender system, I combined two systems: col
 
 For the collaborative system, I used the non-negative matrix factorization algorithm to extract latent features and used these features to find top items for a given user based on his/her previous rating. In the hybrid algorithm, the collaborative filter extracts a top item that a user may like. Then, the content-based system finds similar items to the item that the collaborative suggested. 
 
-I deployed the hybrid system in an AWS ec2 instance ( see [&lt;here&gt;](http://3.84.68.105:8080/) ). For furthure information, please refer to the related slides ([&lt;here&gt;](Slides/Amazon_recommenders.pdf))
+I deployed the hybrid system in an AWS ec2 instance ( see [here](http://3.84.68.105:8080/) ). For furthure information, please refer to the related slides ([here](Slides/Amazon_recommenders.pdf))
 
 <p align="center">
 <img src='Figs/website.png'>
