@@ -43,4 +43,5 @@ I deployed the hybrid system in an AWS ec2 instance ( Fig. 3. Also, see the live
 **Tools:** ANN, NLP, Non-negative matrix factorization
 
 **Programming:** Python (Pandas, Numpy, Scikit-Learn, Matplotlib, Surprise, Flask)
-Big Data: AWS (EC2, S3)
+
+**Big Data:** AWS (EC2, S3)
