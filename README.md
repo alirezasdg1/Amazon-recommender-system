@@ -2,7 +2,7 @@
 
 
 
-<img align="right" src='Figs/recom.png' width='250' height = '120'>In recent decades, many web services such as Netflix, Youtube, Amazon, and other companies  implemented systems to suggest relevant products to their users. Content and collaborative recommenders are among the most popular methods for many web services.
+<img align="right" src='Figs/recom.png' width='500' height = '240'>In recent decades, many web services such as Netflix, Youtube, Amazon, and other companies  implemented systems to suggest relevant products to their users. Content and collaborative recommenders are among the most popular methods for many web services.
 
 These recommenders, however, have their drawbacks. For example, the collaborative filters are not working well to suggest new items to users. Though the context filters can better handle the cold start problem, these filters can only recommend an item whenever there are other items with features similar to the new one. To address the mentioned limitations, I developed a hybrid recommendation system.
 
